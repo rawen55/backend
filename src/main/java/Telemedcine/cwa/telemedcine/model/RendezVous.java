@@ -1,8 +1,9 @@
 package Telemedcine.cwa.telemedcine.model;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,54 +13,49 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "rendez_vous")
 public class RendezVous {
 
-    public static void save(RendezVous rdv) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public static Optional<RendezVous> findById(Long id) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "patient_id", nullable = false)
-    private User patient;
+    private LocalDateTime date;
+
+    private String description;
+
+    private String document; // on stocke le nom du fichier ici
 
     @ManyToOne
     @JoinColumn(name = "medecin_id")
-    private User medecin;
+    private Medecin medecin;
 
-    private LocalDateTime dateHeure;
+    @ManyToOne
+    @JoinColumn(name = "patient_id")
+    private Patient patient;
+    
+@OneToMany(mappedBy = "rendezVous", cascade = CascadeType.ALL)
+private List<Document> documents;
 
+// Getters et setters pour les documents
+public List<Document> getDocuments() {
+    return documents;
+}
+
+public void setDocuments(List<Document> documents) {
+    this.documents = documents;
+}
     @Enumerated(EnumType.STRING)
-    private StatutRdv statut = StatutRdv.EN_ATTENTE;
+    @Column(name = "statut_rdv") // Mapper à la colonne statut_rdv
+    private StatutRdv statutrdv; // Enum pour le statut du rendez-vous
 
-    @Column(columnDefinition = "TEXT")
-    private String rapport;
+    public RendezVous() {}
 
-  
-    public RendezVous() {
-    }
-
-    public RendezVous(User patient, User medecin, LocalDateTime dateHeure, StatutRdv statut, String rapport) {
-        this.patient = patient;
-        this.medecin = medecin;
-        this.dateHeure = dateHeure;
-        this.statut = statut;
-        this.rapport = rapport;
-    }
-
-   
+    // getters et setters
     public Long getId() {
         return id;
     }
@@ -68,56 +64,61 @@ public class RendezVous {
         this.id = id;
     }
 
-    public User getPatient() {
-        return patient;
+    public LocalDateTime getDate() {
+        return date;
     }
 
-    public void setPatient(User patient) {
-        this.patient = patient;
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 
-    public User getMedecin() {
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDocument() {
+        return document;
+    }
+
+    public void setDocument(String document) {
+        this.document = document;
+    }
+
+    public Medecin getMedecin() {
         return medecin;
     }
 
-    public void setMedecin(User medecin) {
+    public void setMedecin(Medecin medecin) {
         this.medecin = medecin;
     }
 
-    public LocalDateTime getDateHeure() {
-        return dateHeure;
+    public Patient getPatient() {
+        return patient;
     }
 
-    public void setDateHeure(LocalDateTime dateHeure) {
-        this.dateHeure = dateHeure;
+    public void setPatient(Patient patient) {
+        this.patient = patient;
     }
 
-    public StatutRdv getStatut() {
-        return statut;
+    
+    public void setDiagnostic(String diagnostic) {
+     
+        throw new UnsupportedOperationException("Unimplemented method 'setDiagnostic'");
     }
 
-    public void setStatut(StatutRdv statut) {
-        this.statut = statut;
+    public StatutRdv getStatutrdv() {
+        return statutrdv;
     }
 
-    public String getRapport() {
-        return rapport;
-    }
-
-    public void setRapport(String rapport) {
-        this.rapport = rapport;
-    }
-
-    @Override
-    public String toString() {
-        return "RendezVous{" +
-                "id=" + id +
-                ", patient=" + (patient != null ? patient.getId() : "null") +
-                ", medecin=" + (medecin != null ? medecin.getId() : "null") +
-                ", dateHeure=" + dateHeure +
-                ", statut=" + statut +
-                ", rapport='" + rapport + '\'' +
-                '}';
+    public void setStatutrdv(StatutRdv statutrdv) {
+        this.statutrdv = statutrdv;
     }
 }
+
+
+
 

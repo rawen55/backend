@@ -1,14 +1,15 @@
 package Telemedcine.cwa.telemedcine.service;
 
-import java.util.Optional;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import Telemedcine.cwa.telemedcine.config.JwtTokenUtil;
-import Telemedcine.cwa.telemedcine.dto.AuthRequest;
-import Telemedcine.cwa.telemedcine.dto.AuthResponse;
 import Telemedcine.cwa.telemedcine.dto.RegisterRequest;
+import Telemedcine.cwa.telemedcine.model.Medecin;
+import Telemedcine.cwa.telemedcine.model.Patient;
 import Telemedcine.cwa.telemedcine.model.Role;
 import Telemedcine.cwa.telemedcine.model.User;
 import Telemedcine.cwa.telemedcine.repositories.UserRepository;
@@ -16,41 +17,59 @@ import Telemedcine.cwa.telemedcine.repositories.UserRepository;
 @Service
 public class AuthService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtTokenUtil jwtTokenUtil;
+    
+        @Autowired
+        private AuthenticationManager authenticationManager;
+    
+        public void performAuthentication(String email, String password) throws AuthenticationException {
+            authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, password)
+            );
+        }
+   
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenUtil jwtTokenUtil) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtTokenUtil = jwtTokenUtil;
-    }
+    @Autowired
+    private UserRepository userRepository;
 
-    public AuthResponse register(RegisterRequest request) {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+   
+    public User registerUser(RegisterRequest request) {
+
+        // Vérification si l'email est déjà utilisé
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Email déjà utilisé !");
         }
-
-        User user = new User();
-        user.setNom(request.getNom());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(Role.valueOf(request.getRole().toUpperCase()));
-
-        userRepository.save(user);
-
-        String token = jwtTokenUtil.generateToken(user.getEmail());
-        return new AuthResponse(token);
-    }
-
-    public AuthResponse login(AuthRequest request) {
-        Optional<User> user = userRepository.findByEmail(request.getEmail());
-
-        if (user.isEmpty() || !passwordEncoder.matches(request.getPassword(), user.get().getPassword())) {
-            throw new RuntimeException("Email ou mot de passe incorrect !");
+        
+    
+        // Encodage du mot de passe
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+    
+        User user;
+    
+        if (request.getRole() == Role.MEDECIN) {
+            // Création d'un médecin
+            Medecin medecin = new Medecin();
+            medecin.setnom(request.getnom());
+            medecin.setPrenom(request.getPrenom()); // récupérer depuis le formulaire
+            medecin.setEmail(request.getEmail());
+            medecin.setPassword(encodedPassword);
+            medecin.setRole(Role.MEDECIN);
+            medecin.setSpecialite(request.getSpecialite());
+            user = medecin;
+        } else {
+            // Création d'un patient
+            Patient patient = new Patient();
+            patient.setnom(request.getnom());
+            patient.setPrenom(request.getPrenom()); // récupérer depuis le formulaire
+            patient.setEmail(request.getEmail());
+            patient.setPassword(encodedPassword);
+            patient.setRole(Role.PATIENT);
+            user = patient;
         }
-
-        String token = jwtTokenUtil.generateToken(user.get().getEmail());
-        return new AuthResponse(token);
+    
+        // Sauvegarde dans la base
+        return userRepository.save(user);
     }
 }

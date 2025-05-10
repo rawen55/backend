@@ -1,24 +1,32 @@
 package Telemedcine.cwa.telemedcine.model;
-import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
+
 import jakarta.persistence.Entity;
-
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 @Entity
-@DiscriminatorValue("ADMIN")
-public class Admin extends User {
-    public Admin() {}
-    @Column(nullable = false)
-    private String niveauAcces; 
+public class Admin {
+    @Id
+    private Long id;
 
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "id")
+    private User user;
 
-    public Admin(String nom,String prenom, String email,Role role, String password, String niveauAcces) {
-        super(nom,prenom ,email, password, role);
-        this.niveauAcces = niveauAcces;
+    public Long getId() {
+        return id;
     }
 
-    public String getNiveauAcces() { return niveauAcces; }
-    public void setNiveauAcces(String niveauAcces) { this.niveauAcces = niveauAcces; }
-    public void gererUtilisateurs() {
-        
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
+

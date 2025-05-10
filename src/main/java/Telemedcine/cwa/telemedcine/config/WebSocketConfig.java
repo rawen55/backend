@@ -32,6 +32,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     @Bean
+
+    
     public MessageChannel messageChannel() {
         return new DirectChannel(); // Canal de messages direct
     }

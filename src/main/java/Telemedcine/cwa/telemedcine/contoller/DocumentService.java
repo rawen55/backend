@@ -1,6 +1,6 @@
-package Telemedcine.cwa.telemedcine.service;
+package Telemedcine.cwa.telemedcine.contoller;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,20 +14,18 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
 
     public DocumentService(DocumentRepository documentRepository) {
-        this.documentRepository = documentRepository;
+        this.documentRepository = documentRepository;//
     }
 
     public Document saveFile(MultipartFile file, User user) throws IOException {
         Document document = new Document();
-        document.setName(file.getOriginalFilename());
-        document.setType(file.getContentType());
-        document.setData(file.getBytes()); 
-        document.setUser(user);
-
+        document.setNom(file.getOriginalFilename());
+        document.setUrl("/uploads/" + file.getOriginalFilename()); // Exemple de chemin
+        document.setData(file.getBytes());
         return documentRepository.save(document);
     }
 
-    public Optional<Document> getFile(Long id) {
-        return documentRepository.findById(id);
+    public List<Document> getDocumentsByRendezVous(Long rendezvousId) {
+        return documentRepository.findByRendezVousId(rendezvousId);
     }
 }

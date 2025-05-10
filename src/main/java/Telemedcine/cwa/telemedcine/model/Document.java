@@ -7,37 +7,46 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-@Entity
 
+@Entity
 public class Document {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-    private String type;
-   
+    private String nom; // Name of the document
+    private String url; // URL or path to the document
+
     @Lob
-    private byte[] data; 
+    private byte[] data; // Optional: Store the file data directly in the database
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user; 
+    @JoinColumn(name = "rendezvous_id")
+    private RendezVous rendezVous; // Link to the RendezVous
 
+    // Getters and setters
     public Long getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getNom() {
+        return nom;
     }
 
-    public String getType() {
-        return type;
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public byte[] getData() {
@@ -48,15 +57,11 @@ public class Document {
         this.data = data;
     }
 
-    public User getUser() {
-        return user;
+    public RendezVous getRendezVous() {
+        return rendezVous;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setRendezVous(RendezVous rendezVous) {
+        this.rendezVous = rendezVous;
     }
-    public void setType(String type) {
-        this.type = type;
-    }
-    
 }
