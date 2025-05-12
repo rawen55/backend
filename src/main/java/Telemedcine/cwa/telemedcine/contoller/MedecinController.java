@@ -37,12 +37,15 @@ public class MedecinController {
             .map(user -> {
                 Telemedcine.cwa.telemedcine.model.Medecin medecin = medecinRepository.findById(user.getId()).orElse(null);
                 String specialite = (medecin != null) ? medecin.getSpecialite() : "";
+                String adresse = (medecin != null) ? medecin.getAdresse() : "";
+                // Créez un objet MedecinDTO avec les informations nécessaires
                 return new MedecinDTO(
                     user.getId(),
                     user.getNom(),
                     user.getPrenom(),
                     user.getEmail(),
-                    specialite
+                    specialite,
+                    adresse
                 );
             })
             .collect(Collectors.toList());

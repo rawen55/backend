@@ -39,7 +39,7 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.GET, "/api/user/me").permitAll()
            .requestMatchers("/api/auth/**").permitAll()
            .requestMatchers("/api/rendezvous/medecin/*/stats").permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/user/{id}/photo/upload").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/user/{id}/photo/upload").authenticated()
             .requestMatchers("/uploads/**").permitAll()
             .requestMatchers("/api/chatbot/**").permitAll() 
             .requestMatchers("/api/user/me").authenticated()

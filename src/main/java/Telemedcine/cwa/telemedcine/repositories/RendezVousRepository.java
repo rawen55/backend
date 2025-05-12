@@ -21,13 +21,25 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
 
     List<RendezVous> findByMedecinIdAndDateBetween(Long medecinId, LocalDate start, LocalDate end);
 
-    @Query("SELECT TO_CHAR(r.date, 'YYYY-IW') AS week, " +
-           "SUM(CASE WHEN r.statutrdv = 'ACCEPTE' THEN 1 ELSE 0 END) AS accepted, " +
-           "SUM(CASE WHEN r.statutrdv = 'REPORTE' THEN 1 ELSE 0 END) AS rescheduled, " +
-           "SUM(CASE WHEN r.statutrdv = 'REFUSE' THEN 1 ELSE 0 END) AS refused " +
-           "FROM RendezVous r " +
-           "GROUP BY week " +
-           "ORDER BY week ASC")
+    @Query("SELECT EXTRACT(WEEK FROM r.date) AS week, COUNT(r.id) AS acceptedCount, COUNT(DISTINCT r.patient.id) AS totalPatients " +
+       "FROM RendezVous r " +
+       "WHERE r.statutrdv = 'ACCEPTE' " +
+       "GROUP BY EXTRACT(WEEK FROM r.date)")
     List<Object[]> findWeeklyStats();
+
+    @Query("SELECT EXTRACT(MONTH FROM r.date) AS month, COUNT(r.id) AS acceptedCount, COUNT(DISTINCT r.patient.id) AS totalPatients " +
+       "FROM RendezVous r " +
+       "WHERE r.statutrdv = 'ACCEPTE' " +
+       "GROUP BY EXTRACT(MONTH FROM r.date)")
+    List<Object[]> findMonthlyStats();
+
+    @Query("SELECT EXTRACT(YEAR FROM r.date) AS year, COUNT(r.id) AS acceptedCount, COUNT(DISTINCT r.patient.id) AS totalPatients " +
+       "FROM RendezVous r " +
+       "WHERE r.statutrdv = 'ACCEPTE' " +
+       "GROUP BY EXTRACT(YEAR FROM r.date)")
+    List<Object[]> findYearlyStats();
+
+    Long countByMedecinIdAndStatutrdv(Long medecinId, StatutRdv statutrdv);
+
 
 }

@@ -1,9 +1,7 @@
 package Telemedcine.cwa.telemedcine.service;
 
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,26 +96,54 @@ public class RendezVousService {
         rendezVousRepository.delete(rendezVous);
  
     }
-  public Map<String, Object> getWeeklyStatsForMedecin(Long medecinId) {
-    LocalDate today = LocalDate.now();
-    LocalDateTime startOfWeek = today.with(DayOfWeek.MONDAY).atStartOfDay();
-    LocalDateTime endOfWeek = today.with(DayOfWeek.SUNDAY).atTime(23, 59, 59);
+    
 
-    // Utiliser statutrdv ici
-    List<RendezVous> rdvs = rendezVousRepository
-        .findByMedecinIdAndDateBetween(medecinId, startOfWeek.toLocalDate(), endOfWeek.toLocalDate());
+    public Map<String, Object> getWeeklyStats() {
+        return calculateStats("WEEK");
+    }
 
-    long accepted = rdvs.stream()
-        .filter(r -> r.getStatutrdv() == StatutRdv.ACCEPTE)
-        .count();
-    long refused = rdvs.stream()
-        .filter(r -> r.getStatutrdv() == StatutRdv.REFUSE)
-        .count();
+    public Map<String, Object> getMonthlyStats() {
+        return calculateStats("MONTH");
+    }
 
-    Map<String, Object> stats = new HashMap<>();
-    stats.put("total", rdvs.size());
-    stats.put("accepted", accepted);
-    stats.put("refused", refused);
+    public Map<String, Object> getYearlyStats() {
+        return calculateStats("YEAR");
+    }
 
-    return stats;
-}}
+    private Map<String, Object> calculateStats(String period) {
+        List<Object[]> stats = switch (period) {
+            case "WEEK" -> rendezVousRepository.findWeeklyStats();
+            case "MONTH" -> rendezVousRepository.findMonthlyStats();
+            case "YEAR" -> rendezVousRepository.findYearlyStats();
+            default -> throw new IllegalArgumentException("Invalid period: " + period);
+        };
+
+        Map<String, Object> result = new HashMap<>();
+        List<String> labels = new ArrayList<>();
+        List<Long> acceptedCounts = new ArrayList<>();
+        List<Long> totalPatients = new ArrayList<>();
+
+        for (Object[] stat : stats) {
+            labels.add(stat[0].toString()); // e.g., week number, month name, or year
+            acceptedCounts.add((Long) stat[1]); // Count of accepted consultations
+            totalPatients.add((Long) stat[2]); // Count of unique patients
+        }
+
+        result.put("labels", labels);
+        result.put("accepted", acceptedCounts);
+        result.put("totalPatients", totalPatients);
+        return result;
+    }
+
+
+    public Long countNewConsultationsForMedecin(Long medecinId) {
+        // Count consultations with status EN_ATTENTE for the given doctor
+        return rendezVousRepository.countByMedecinIdAndStatutrdv(medecinId, StatutRdv.EN_ATTENTE);
+    }
+
+    
+
+
+
+
+}

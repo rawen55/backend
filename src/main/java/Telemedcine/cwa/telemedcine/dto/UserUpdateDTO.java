@@ -5,16 +5,17 @@ public class UserUpdateDTO {
     private String prenom;
     private String email;
     private String specialite; 
-
+private String adresse;
     public UserUpdateDTO() {
     }
 
     
-    public UserUpdateDTO(String nom, String prenom, String email, String specialite) {
+    public UserUpdateDTO(String nom, String prenom, String email, String specialite,String adresse) {
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
         this.specialite = specialite;
+        this.adresse = adresse;
     }
 
   
@@ -48,5 +49,13 @@ public class UserUpdateDTO {
 
     public void setSpecialite(String specialite) {
         this.specialite = specialite;
+    }
+
+    public String getAdresse() {
+        return adresse;
+    }
+
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
     }
 }

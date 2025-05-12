@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import Telemedcine.cwa.telemedcine.model.Medecin;
+import Telemedcine.cwa.telemedcine.model.Notification;
 import Telemedcine.cwa.telemedcine.model.Patient;
 import Telemedcine.cwa.telemedcine.model.RendezVous;
 import Telemedcine.cwa.telemedcine.model.StatutRdv;
@@ -100,10 +102,21 @@ public ResponseEntity<?> createRendezVous(
     }
     private static final Logger log = LoggerFactory.getLogger(RendezVousController.class);
    // @PreAuthorize("hasAuthority('MEDECIN')")//
-   @PutMapping("/{id}/statut")
+       @Autowired
+private SimpMessagingTemplate messagingTemplate;
+@PutMapping("/{id}/statut")
 public ResponseEntity<?> accepterRendezVous(@PathVariable Long id) {
     try {
+        // Accepter le rendez-vous
         RendezVous rendezVous = rendezVousService.accepterRendezVous(id);
+        
+        // Envoyer la notification au patient concerné
+        messagingTemplate.convertAndSend(
+            "/topic/notifications/" + rendezVous.getPatient().getId(),
+            new Notification("Votre rendez-vous a été accepté.")
+        );
+
+        // Retourner la réponse avec le rendez-vous accepté
         return ResponseEntity.ok(rendezVous);
     } catch (Exception e) {
         log.error("Erreur lors de l'acceptation du rendez-vous", e);
@@ -164,15 +177,53 @@ public ResponseEntity<List<RendezVous>> getRendezVousByMedecin(@PathVariable Lon
         List<RendezVous> rendezVousList = rendezVousService.getRendezVousByPatientId(id);
         return ResponseEntity.ok(rendezVousList);
     }
-   
+       
+    @GetMapping("/medecin/new-consultations")
+        public ResponseEntity<Long> getNewConsultationsForMedecin() {
+        // Fetch the authenticated doctor's ID
+        Long medecinId = getAuthenticatedMedecinId();
 
-  
+        // Fetch the count of new consultations
+        Long newConsultationCount = rendezVousService.countNewConsultationsForMedecin(medecinId);
+        return ResponseEntity.ok(newConsultationCount);
+    }
+    
+    
+    private Long getAuthenticatedMedecinId() {
+    // Logic to fetch the authenticated doctor's ID (e.g., from SecurityContext)
+    String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-    @GetMapping("/stats/weekly/{medecinId}")
- 
-    public ResponseEntity<?> getWeeklyStatsForMedecin(@PathVariable Long medecinId) {
-        Map<String, Object> stats = rendezVousService.getWeeklyStatsForMedecin(medecinId);
+    // Fetch the Medecin object directly
+    Medecin medecin = medecinRepository.findByEmail(email);
+
+    // Check if the Medecin object is null and throw an exception if necessary
+    if (medecin == null) {
+        throw new RuntimeException("Médecin introuvable");
+    }
+
+    // Return the ID of the Medecin
+    return medecin.getId();
+}
+
+
+@GetMapping("/stats/weekly")
+    public ResponseEntity<Map<String, Object>> getWeeklyStats() {
+        Map<String, Object> stats = rendezVousService.getWeeklyStats();
         return ResponseEntity.ok(stats);
     }
+
+    @GetMapping("/stats/monthly")
+    public ResponseEntity<Map<String, Object>> getMonthlyStats() {
+        Map<String, Object> stats = rendezVousService.getMonthlyStats();
+        return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/stats/yearly")
+    public ResponseEntity<Map<String, Object>> getYearlyStats() {
+        Map<String, Object> stats = rendezVousService.getYearlyStats();
+        return ResponseEntity.ok(stats);
+    }
+
+
 
 }

@@ -30,6 +30,8 @@ public class RendezVous {
 
     private String document; // on stocke le nom du fichier ici
 
+    // Removed duplicate declaration of statutrdv
+
     @ManyToOne
     @JoinColumn(name = "medecin_id")
     private Medecin medecin;
@@ -49,9 +51,9 @@ public List<Document> getDocuments() {
 public void setDocuments(List<Document> documents) {
     this.documents = documents;
 }
-    @Enumerated(EnumType.STRING)
-    @Column(name = "statut_rdv") // Mapper à la colonne statut_rdv
-    private StatutRdv statutrdv; // Enum pour le statut du rendez-vous
+ @Enumerated(EnumType.STRING)
+@Column(name = "statut_rdv") // Mapper à la colonne statut_rdv
+private StatutRdv statutrdv; // Enum pour le statut du rendez-vous
 
     public RendezVous() {}
 

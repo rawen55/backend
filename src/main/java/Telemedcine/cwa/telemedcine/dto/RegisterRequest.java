@@ -25,16 +25,17 @@ public class RegisterRequest {
 
     private String specialite;
     
-
+private String adresse;
     public RegisterRequest() {}
 
-    public RegisterRequest(String nom, String prenom, String email, String password, Role role, String specialite) {
+    public RegisterRequest(String nom, String prenom, String email, String password, Role role, String specialite,String adresse) {
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
         this.password = password;
         this.role = role;
         this.specialite = specialite;
+        this.adresse = adresse;
     }
 
     public String getnom() {
@@ -83,5 +84,15 @@ public class RegisterRequest {
 
     public void setSpecialite(String specialite) {
         this.specialite = specialite;
+    }
+
+    
+
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
+    }
+
+    public String getAdresse() {
+        return adresse;
     }
 }

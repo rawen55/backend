@@ -60,6 +60,7 @@ public class UserService {
                 medecin.setPassword(encodedPassword);
                 medecin.setRole(Role.MEDECIN);
                 medecin.setSpecialite(request.getSpecialite());
+                medecin.setAdresse(request.getAdresse());
                 user = medecin;
             }
           
@@ -83,10 +84,10 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-            .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé avec l'email : " + email));
-    }
+   public User findByEmail(String email) {
+    return userRepository.findByEmail(email)
+        .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé avec l'email : " + email));
+}
     public User findById(Long id) {
         return userRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'ID : " + id));

@@ -6,13 +6,14 @@ public class MedecinDTO {
     private String prenom;
     private String email;
     private String specialite;
-
+    private String adresse;
     // Constructeur vide
     public MedecinDTO() {}
 
     // Constructeur avec tous les champs
-    public MedecinDTO(Long id, String nom, String prenom, String email, String specialite) {
+    public MedecinDTO(Long id, String nom, String prenom, String email, String specialite,String adresse) {
         this.id = id;
+        this.adresse = adresse;
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
@@ -58,5 +59,13 @@ public class MedecinDTO {
 
     public void setSpecialite(String specialite) {
         this.specialite = specialite;
+    }
+
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
+    }
+
+    public String getAdresse() {
+        return adresse;
     }
 }
