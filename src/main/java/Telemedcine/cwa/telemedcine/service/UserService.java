@@ -40,42 +40,36 @@ public class UserService {
 
         User user;
 
-        if (null == request.getRole()) {
-            
-            user = new Patient();
-
-            user.setnom(request.getnom());
-            user.setPrenom(request.getPrenom()); // ou demander dans le formulaire
-            user.setEmail(request.getEmail());
-            user.setPassword(encodedPassword);
-            user.setRole(request.getRole());
-        } 
-        else switch (request.getRole()) {
-            case MEDECIN -> {
-                // Création d'un médecin
-                Medecin medecin = new Medecin();
-                medecin.setnom(request.getnom());
-                medecin.setPrenom(request.getPrenom()); // ou demander dans le formulaire
-                medecin.setEmail(request.getEmail());
-                medecin.setPassword(encodedPassword);
-                medecin.setRole(Role.MEDECIN);
-                medecin.setSpecialite(request.getSpecialite());
-                medecin.setAdresse(request.getAdresse());
-                user = medecin;
-            }
-          
-                
-            
-
-            default -> {
-                user = new Patient();
-                user.setnom(request.getnom());
-                user.setPrenom(request.getPrenom()); // ou demander dans le formulaire
-                user.setEmail(request.getEmail());
-                user.setPassword(encodedPassword);
-                user.setRole(request.getRole());
-            }
-        }
+         if (request.getRole() == Role.MEDECIN) {
+        // Création d'un médecin
+        Medecin medecin = new Medecin();
+        medecin.setnom(request.getnom());
+        medecin.setPrenom(request.getPrenom());
+        medecin.setEmail(request.getEmail());
+        medecin.setPassword(encodedPassword);
+        medecin.setRole(Role.MEDECIN);
+        medecin.setSpecialite(request.getSpecialite());
+        medecin.setAdresse(request.getAdresse());
+        user = medecin;
+    } else if (request.getRole() == Role.ADMIN) {
+        // Création d'un administrateur
+        User admin = new User();
+        admin.setnom(request.getnom());
+        admin.setPrenom(request.getPrenom());
+        admin.setEmail(request.getEmail());
+        admin.setPassword(encodedPassword);
+        admin.setRole(Role.ADMIN);
+        user = admin;
+    } else {
+        // Création d'un patient
+        Patient patient = new Patient();
+        patient.setnom(request.getnom());
+        patient.setPrenom(request.getPrenom());
+        patient.setEmail(request.getEmail());
+        patient.setPassword(encodedPassword);
+        patient.setRole(Role.PATIENT);
+        user = patient;
+    }
 
         // Sauvegarde dans la base
         return utilisateurRepository.save(user);

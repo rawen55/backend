@@ -58,16 +58,25 @@ public class AuthService {
             medecin.setRole(Role.MEDECIN);
             medecin.setSpecialite(request.getSpecialite());
             user = medecin;
-        } else {
-            // Création d'un patient
-            Patient patient = new Patient();
-            patient.setnom(request.getnom());
-            patient.setPrenom(request.getPrenom()); // récupérer depuis le formulaire
-            patient.setEmail(request.getEmail());
-            patient.setPassword(encodedPassword);
-            patient.setRole(Role.PATIENT);
-            user = patient;
-        }
+        } else if (request.getRole() == Role.ADMIN) {
+        // Création d'un administrateur
+        User admin = new User();
+        admin.setnom(request.getnom());
+        admin.setPrenom(request.getPrenom());
+        admin.setEmail(request.getEmail());
+        admin.setPassword(encodedPassword);
+        admin.setRole(Role.ADMIN);
+        user = admin;
+    } else {
+        // Création d'un patient
+        Patient patient = new Patient();
+        patient.setnom(request.getnom());
+        patient.setPrenom(request.getPrenom());
+        patient.setEmail(request.getEmail());
+        patient.setPassword(encodedPassword);
+        patient.setRole(Role.PATIENT);
+        user = patient;
+    }
     
         // Sauvegarde dans la base
         return userRepository.save(user);

@@ -1,6 +1,7 @@
 package Telemedcine.cwa.telemedcine.service;
 
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +44,6 @@ public class RendezVousService {
         rv.setMedecin(medecin);
         rv.setPatient(patient);
         rv.setDate(dto.getDate());
-        rv.setDescription(dto.getDescription());
         rv.setDocument(dto.getDocument());
         try {
             rv.setStatutrdv(StatutRdv.valueOf("EN_ATTENTE"));
@@ -141,8 +141,13 @@ public class RendezVousService {
         return rendezVousRepository.countByMedecinIdAndStatutrdv(medecinId, StatutRdv.EN_ATTENTE);
     }
 
-    
-
+    public RendezVous reportRendezVous(Long id, LocalDateTime newDate) throws Exception {
+    RendezVous rendezVous = rendezVousRepository.findById(id)
+        .orElseThrow(() -> new Exception("Rendez-vous non trouvé"));
+    rendezVous.setDate(newDate);
+    rendezVous.setStatutrdv(StatutRdv.REPORTE); // Assuming "REPORTE" is a valid status in your `StatutRdv` enum
+    return rendezVousRepository.save(rendezVous);
+}
 
 
 

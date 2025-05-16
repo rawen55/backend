@@ -3,6 +3,7 @@ package Telemedcine.cwa.telemedcine.repositories;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +13,10 @@ import Telemedcine.cwa.telemedcine.model.StatutRdv;
 
 public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
     List<RendezVous> findByMedecinId(Long medecinId);
-  
+
+   
+   Optional<RendezVous> findTopByPatientIdOrderByDateDesc(Long patientId);
+
 
     // Corriger ici : utiliser statutrdv au lieu de statutRdv
     List<RendezVous> findByMedecinIdAndStatutrdv(Long medecinId, StatutRdv statutrdv);

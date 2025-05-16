@@ -54,6 +54,8 @@ public class SecurityConfig {
             .requestMatchers("/api/rendezvous/stats/weekly").permitAll() // Restreindre l'accès à ce rôle
             .requestMatchers("/api/medecin").permitAll()
             .requestMatchers("/api/medecin/**").permitAll()
+            .requestMatchers("/api/admin/**").permitAll()
+            .requestMatchers("/api/patient/{id]/preconsultation}").permitAll()
 
             )
             
